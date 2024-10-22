@@ -64,9 +64,9 @@ class Helper
         $defaultEmail = isset($user->user_email) ? [$user->user_email] : [];
 
         $settings = [
-            'rowsToShow'   => isset($settings['rowsToShow']) ? $settings['rowsToShow'] : 5,
-            'dateFormat'       => isset($settings['dateFormat']) ? $settings['dateFormat'] : 'human_readable',
-            'emails'   => isset($settings['emails']) ? $settings['emails'] : $defaultEmail,
+            'rowsToShow'   => isset($settings['rowsToShow']) ? (int) sanitize_text_field($settings['rowsToShow']) : 5,
+            'dateFormat'   => isset($settings['dateFormat']) ? sanitize_text_field($settings['dateFormat']) : 'human_readable',
+            'emails'       => isset($settings['emails']) ? array_map('sanitize_email', $settings['emails']) : $defaultEmail,
         ];
 
         return $settings;
@@ -75,19 +75,10 @@ class Helper
     // sanitize data
     public static function sanitizeData ($data)
     {
-        $rowsToShow = sanitize_text_field($data['rowsToShow']);
-        $dateFormat = sanitize_text_field($data['dateFormat']);
-        $emails = $data['emails'];
-        $email = [];
-
-        foreach ($emails as $key => $value) {
-            $email[] = sanitize_email($value);
-        }
-
         return [
-            'rowsToShow' => $rowsToShow,
-            'dateFormat' => $dateFormat,
-            'emails' => $email
+            'rowsToShow' => sanitize_text_field($data['rowsToShow']),
+            'dateFormat' => sanitize_text_field($data['dateFormat']),
+            'emails'     => array_map('sanitize_email', $data['emails']),
         ];
 
     }
@@ -106,8 +97,8 @@ class Helper
         $values = [];
 
         foreach ($graphData as $data) {
-            $labels[] = date('d F Y', $data['date']);
-            $values[] = $data['value'];
+            $labels[] = date('d F Y', sanitize_text_field($data['date']));
+            $values[] = sanitize_text_field($data['value']);
         }
 
         return [
@@ -126,7 +117,7 @@ class Helper
         foreach ($tableData as $key => $data) {
             $formattedTableData[$key] = $data;
             if ($settings['dateFormat'] !== 'unix') {
-                $formattedTableData[$key]['date'] = date('d M Y', $data['date']);
+                $formattedTableData[$key]['date'] = date('d M Y', sanitize_text_field($data['date']));
             }
 
             if (count($formattedTableData) === $rowsToDisplay) {

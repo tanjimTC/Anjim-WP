@@ -36,7 +36,7 @@ class AjaxHandler
 
     private function getRequestedRoute()
     {
-        return sanitize_text_field($_REQUEST['route']);
+        return sanitize_text_field($_REQUEST['route'] ?? '');
     }
 
     private function executeAction($route)
@@ -56,8 +56,7 @@ class AjaxHandler
             'clear_cache' => 'clearCache'
         ];
 
-        return isset($routes[$route]) ? $routes[$route] : null;
-
+        return $routes[$route] ?? null;
     }
 
     public function retrieveSettings()
@@ -69,7 +68,7 @@ class AjaxHandler
 
     public function updateSettings()
     {
-        $settingsJson = isset($_REQUEST['settings']) ? $_REQUEST['settings'] : '';
+        $settingsJson = isset($_REQUEST['settings']) ? sanitize_text_field($_REQUEST['settings']) : '';
         $settings = json_decode(wp_unslash($settingsJson), true);
 
         try {
@@ -78,11 +77,9 @@ class AjaxHandler
             wp_send_json_success(['message' => __("Settings updated successfully!", "anjum-wp-task")], 200);
         } catch (\Exception $exception) {
             $errorMessages = json_decode($exception->getMessage(), true);
-            wp_send_json_error(['message' => $errorMessages['message']], 400);
+            wp_send_json_error(['message' => sanitize_text_field($errorMessages['message'])], 400);
         }
     }
-
-
 
     private function updateSettingsData($settings)
     {
@@ -94,7 +91,7 @@ class AjaxHandler
     public function retrieveData()
     {
         try {
-            $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : 'graph';
+            $type = isset($_REQUEST['type']) ? sanitize_text_field($_REQUEST['type']) : 'graph';
             if ($type === 'graph') {
                 $graphData = $this->fetchGraphData();
                 wp_send_json_success(['graphData' => $graphData]);
@@ -104,10 +101,9 @@ class AjaxHandler
                 'tableData' => $tableData,
                 'emails' => $this->helper->retrieveEmails()
             ]);
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             $error = $exception->getMessage();
-            wp_send_json_error(['message' => $error], 400);
+            wp_send_json_error(['message' => sanitize_text_field($error)], 400);
         }
     }
 
@@ -115,12 +111,10 @@ class AjaxHandler
     {
         try {
             $allData = $this->fetchApiData();
-            $graphData = isset($allData['graph']) ? $allData['graph'] : [];
+            $graphData = $allData['graph'] ?? [];
             return $this->helper->configureGraphData($graphData);
-
         } catch (\Exception $exception) {
-            $error = $exception->getMessage();
-            throw new \Exception($error);
+            throw new \Exception(sanitize_text_field($exception->getMessage()));
         }
     }
 
@@ -130,31 +124,24 @@ class AjaxHandler
             $allData = $this->fetchApiData();
             $config = maybe_unserialize(get_option('anjum_wp_task_settings', []));
             $settings = $this->helper->organizeSettings($config);
-            $tableData = isset($allData['table']['data']['rows']) ? $allData['table']['data']['rows'] : [];
+            $tableData = $allData['table']['data']['rows'] ?? [];
             return $this->helper->configureTableData($tableData, $settings);
-
         } catch (\Exception $exception) {
-            $error = $exception->getMessage();
-            throw new \Exception($error);
+            throw new \Exception(sanitize_text_field($exception->getMessage()));
         }
     }
 
     private function fetchApiData()
     {
         try {
-            $cacheHandler =  $this->cacheHandler;
-            $taskData = $cacheHandler->getCache('anjum_wp_task_data');
-            error_log('task data '.print_r($taskData, true));
+            $taskData = $this->cacheHandler->getCache('anjum_wp_task_data');
             if (!$taskData) {
                 $taskData = $this->makeHttpRequest();
-                error_log('task data from api '.print_r($taskData, true));
-                $cacheHandler->createCache('anjum_wp_task_data', $taskData);
+                $this->cacheHandler->createCache('anjum_wp_task_data', $taskData);
             }
             return $taskData;
-
         } catch (\Exception $exception) {
-            $error = $exception->getMessage();
-            throw new \Exception($error);
+            throw new \Exception(sanitize_text_field($exception->getMessage()));
         }
     }
 
@@ -166,23 +153,20 @@ class AjaxHandler
 
     private function makeHttpRequest()
     {
-        $request = wp_remote_get($this->remoteFetchUrl);
+        $request = wp_remote_get(esc_url($this->remoteFetchUrl));
 
         if (is_wp_error($request)) {
-            $message = $request->get_error_message();
+            $message = sanitize_text_field($request->get_error_message());
             throw new \Exception($message);
         }
 
         $body = json_decode(wp_remote_retrieve_body($request), true);
 
         if (isset($body['error'])) {
-            $error = 'Something went wrong, please try again later';
-            if (isset($body['error']['message'])) {
-                $error = $body['error']['message'];
-            }
-
+            $error = sanitize_text_field($body['error']['message'] ?? 'Something went wrong, please try again later');
             throw new \Exception($error);
         }
+
         return $body;
     }
 }
