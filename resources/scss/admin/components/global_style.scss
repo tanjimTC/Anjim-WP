@@ -1,0 +1,65 @@
+.toplevel_page_anjum-wp-task{
+  #wpwrap{
+    > #wpcontent{
+      padding-left: 0;
+    }
+  }
+  #wpbody-content{
+    .wrap{
+      margin: 0;
+    }
+  }
+}
+
+
+.anjum-wp-navbar {
+  background-color: #208497;
+  overflow: hidden;
+  width: 100%;
+  /* Style the links inside the navigation bar */
+  a {
+    float: left;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    outline: none;
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
+  /* Add a color to the active/current link */
+  a.ninja-tab-active {
+    background-color: #095361;
+    border: none;
+  }
+}
+
+
+#anjum-wp-task_app {
+  .anjum-task-content-wrapper {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    margin-top: 20px;
+  }
+  .anjum-task-text-center {
+    text-align: center;
+  }
+  .anjum-wp-task-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #0e2439;
+  }
+
+  .anjum-wp-box-container {
+    margin-top: 20px;
+    padding: 20px;
+    background: white;
+  }
+}

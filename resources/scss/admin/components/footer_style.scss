@@ -1,0 +1,65 @@
+.anjum-wp-footer {
+  color: black;
+  padding:10px 20px;
+}
+
+.anjum-wp-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.anjum-wp-social-links ul,
+.anjum-wp-menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.anjum-wp-social-links li,
+.anjum-wp-menu li {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.anjum-wp-social-links li:last-child,
+.anjum-wp-menu li:last-child {
+  margin-right: 0;
+}
+
+.anjum-wp-social-links a {
+  color: black;
+  font-size: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.anjum-wp-menu a {
+  margin-right: 10px;
+  text-decoration: none;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.anjum-wp-menu a:focus {
+  outline: none;
+}
+
+
+.anjum-wp-copyright {
+  text-align: center;
+}
+
+.anjum-wp-copyright p {
+  font-size: 14px;
+  margin: 0px;
+}
